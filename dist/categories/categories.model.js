@@ -2,7 +2,7 @@
 exports.__esModule = true;
 var mongoose = require("mongoose");
 var categorySchema = new mongoose.Schema({
-    descricao: {
+    description: {
         type: String,
         unique: true
     }

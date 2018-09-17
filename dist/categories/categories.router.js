@@ -13,60 +13,52 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var router_1 = require("../common/router");
+var model_router_1 = require("../common/model-router");
 var categories_model_1 = require("./categories.model");
 var CategoriesRouter = /** @class */ (function (_super) {
     __extends(CategoriesRouter, _super);
     function CategoriesRouter() {
-        var _this = _super.call(this) || this;
+        var _this = _super.call(this, categories_model_1.Category) || this;
+        _this.findSubCategory = function (req, resp, next) {
+            categories_model_1.Category.findById(req.params.id)
+                .then(function (category) {
+                if (category) {
+                    resp.json(category.subCategories);
+                    return next();
+                }
+                else {
+                }
+            })["catch"](next);
+        };
+        _this.addSubCategory = function (req, resp, next) {
+            categories_model_1.Category.findById(req.params.id)
+                .then(function (category) {
+                if (category) {
+                    category.subCategories = req.body;
+                    return category.save();
+                }
+                else {
+                }
+            })
+                .then(function (category) {
+                resp.json(category.subCategories);
+                return next();
+            })["catch"](next);
+        };
         _this.on('beforeRender', function (document) {
         });
         return _this;
     }
     CategoriesRouter.prototype.applyRoutes = function (application) {
-        var _this = this;
-        application.get('/categories', function (req, resp, next) {
-            categories_model_1.Category.find().then(_this.render(resp, next));
-        });
-        application.get('/categories/:id', function (req, resp, next) {
-            categories_model_1.Category.findById(req.params.id).then(_this.render(resp, next));
-        });
-        application.post('/categories', function (req, resp, next) {
-            var category = new categories_model_1.Category(req.body);
-            category.save().then(_this.render(resp, next));
-        });
-        application.put('/categories/:id', function (req, resp, next) {
-            var options = { overwrite: true };
-            categories_model_1.Category.update({ _id: req.params.id }, req.body, options)
-                .exec()
-                .then(function (result) {
-                if (result.n) {
-                    return categories_model_1.Category.findById(req.params.id);
-                }
-                else {
-                    resp.send(404);
-                }
-            }).then(_this.render(resp, next));
-        });
-        application.patch('/categories/:id', function (req, resp, next) {
-            var options = { "new": true };
-            categories_model_1.Category.findByIdAndUpdate({ _id: req.params.id }, req.body, options)
-                .then(_this.render(resp, next));
-        });
-        application.del('/categories/:id', function (req, resp, next) {
-            categories_model_1.Category.remove({ _id: req.params.id })
-                .exec()
-                .then(function (commandResult) {
-                if (commandResult.result.any) {
-                    resp.send(200);
-                }
-                else {
-                    resp.send(404);
-                }
-                return next();
-            });
-        });
+        application.get('/categories', this.findAll);
+        application.get('/categories/:id', [this.validateId, this.findById]);
+        application.get('/categories/:id/subcategories', [this.validateId, this.findSubCategory]);
+        application.post('/categories', this.save);
+        application.put('/categories/:id/subcategories', [this.validateId, this.addSubCategory]);
+        application.put('/categories/:id', [this.validateId, this.replace]);
+        application.patch('/categories/:id', [this.validateId, this.update]);
+        application.del('/categories/:id', [this.validateId, this["delete"]]);
     };
     return CategoriesRouter;
-}(router_1.Router));
+}(model_router_1.ModelRouter));
 exports.categoriesRouter = new CategoriesRouter();

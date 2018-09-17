@@ -1,61 +1,62 @@
 import * as restify from 'restify'
-import {Router} from '../common/router'
+import {ModelRouter} from '../common/model-router'
 import {Category} from './categories.model'
 
-class CategoriesRouter extends Router {
+class CategoriesRouter extends ModelRouter<Category> {
 
     constructor(){
-        super()
+        super(Category)
         this.on('beforeRender', document=>{
             
         })
     }
 
-    applyRoutes(application: restify.Server){
-        application.get('/categories', (req, resp, next)=>{
-            Category.find().then(this.render(resp, next))
-        })
-
-        application.get('/categories/:id', (req, resp, next)=>{
-            Category.findById(req.params.id).then(this.render(resp, next))
-        })
-
-        application.post('/categories', (req, resp, next)=>{
-            let category = new Category(req.body)
-            category.save().then(this.render(resp, next))
-        })
-
-        application.put('/categories/:id', (req, resp, next)=>{
-            const options = {overwrite: true}
-            Category.update({_id:req.params.id}, req.body, options)
-                .exec()
-                .then(result=>{
-                    if(result.n){
-                        return Category.findById(req.params.id)
+    findSubCategory = (req, resp, next)=>{
+        Category.findById(req.params.id)
+                .then(category=>{
+                    if(category){
+                        resp.json(category.subCategories)
+                        return next()
                     }else{
-                        resp.send(404)
+                        
                     }
-                }).then(this.render(resp, next))
-        })
+                })
+                .catch(next)
+    }
 
-        application.patch('/categories/:id', (req, resp, next)=>{
-            const options = {new: true}
-            Category.findByIdAndUpdate({_id:req.params.id}, req.body, options)
-                .then(this.render(resp, next))
-        })
-
-        application.del('/categories/:id', (req, resp, next)=>{
-            Category.remove({_id:req.params.id})
-                .exec()
-                .then((commandResult: any)=>{
-                    if(commandResult.result.any){
-                        resp.send(200)
+    addSubCategory = (req, resp, next)=>{
+        Category.findById(req.params.id)
+                .then(category=>{
+                    if(category){
+                        category.subCategories = req.body
+                        return category.save()
                     }else{
-                        resp.send(404)
+                        
                     }
+                })
+                .then(category=>{
+                    resp.json(category.subCategories)
                     return next()
                 })
-        })
+                .catch(next)
+    }
+
+    applyRoutes(application: restify.Server){
+        application.get('/categories', this.findAll)
+
+        application.get('/categories/:id', [this.validateId, this.findById])
+
+        application.get('/categories/:id/subcategories', [this.validateId, this.findSubCategory])
+
+        application.post('/categories', this.save)
+
+        application.put('/categories/:id/subcategories', [this.validateId, this.addSubCategory])
+
+        application.put('/categories/:id', [this.validateId, this.replace])
+
+        application.patch('/categories/:id', [this.validateId, this.update])
+
+        application.del('/categories/:id', [this.validateId, this.delete])
     }
 }
 

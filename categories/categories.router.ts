@@ -50,7 +50,7 @@ class CategoriesRouter extends ModelRouter<Category> {
 
         application.post('/categories', this.save)
 
-        application.put('/categories/:id/subcategories', [this.validateId, this.addSubCategory])
+        //application.put('/categories/:id/subcategories', [this.validateId, this.addSubCategory])
 
         application.put('/categories/:id', [this.validateId, this.replace])
 

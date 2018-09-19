@@ -13,7 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var model_router_1 = require("../common/model-router");
+var model_router_1 = require("../../common/model-router");
 var categories_model_1 = require("./categories.model");
 var CategoriesRouter = /** @class */ (function (_super) {
     __extends(CategoriesRouter, _super);
@@ -30,11 +30,11 @@ var CategoriesRouter = /** @class */ (function (_super) {
                 }
             })["catch"](next);
         };
-        _this.addSubCategory = function (req, resp, next) {
+        _this.addSubCategories = function (req, resp, next) {
             categories_model_1.Category.findById(req.params.id)
                 .then(function (category) {
                 if (category) {
-                    category.subCategories = req.body;
+                    category.subCategories = _this.sortSubCategoriesArray(category.subCategories.concat(req.body));
                     return category.save();
                 }
                 else {
@@ -45,16 +45,38 @@ var CategoriesRouter = /** @class */ (function (_super) {
                 return next();
             })["catch"](next);
         };
+        _this.deleteSubCategory = function (req, resp, next) {
+            categories_model_1.Category.findById(req.params.id)
+                .then(function (category) {
+                if (category) {
+                    //category.subCategories = category.subCategories.forEach(())
+                    return next();
+                }
+                else {
+                }
+            })["catch"](next);
+        };
         _this.on('beforeRender', function (document) {
         });
         return _this;
     }
+    CategoriesRouter.prototype.sortSubCategoriesArray = function (subCategories) {
+        return subCategories.sort(function (a, b) {
+            if (a.description > b.description) {
+                return 1;
+            }
+            if (a.description < b.description) {
+                return -1;
+            }
+            return 0;
+        });
+    };
     CategoriesRouter.prototype.applyRoutes = function (application) {
         application.get('/categories', this.findAll);
         application.get('/categories/:id', [this.validateId, this.findById]);
         application.get('/categories/:id/subcategories', [this.validateId, this.findSubCategory]);
         application.post('/categories', this.save);
-        //application.put('/categories/:id/subcategories', [this.validateId, this.addSubCategory])
+        application.put('/categories/:id/subcategories', [this.validateId, this.addSubCategories]);
         application.put('/categories/:id', [this.validateId, this.replace]);
         application.patch('/categories/:id', [this.validateId, this.update]);
         application.del('/categories/:id', [this.validateId, this["delete"]]);

@@ -1,21 +1,11 @@
 import * as mongoose from 'mongoose'
-
-export interface SubCategoryItem extends mongoose.Document{
-    description: String
-}
+//import * as subcategories from '../subcategories/subcategories.model'
+import {subCategorySchema, SubCategoryModel} from '../subcategories/subcategories.model'
 
 export interface Category extends mongoose.Document {
-    description: string
-    subCategories: SubCategoryItem[]
+    description: string,
+    subCategories: SubCategoryModel[]
 }
-
-const subCategorySchema = new mongoose.Schema({
-    description:{
-        type: String,
-        required: true,
-        unique: true
-    }
-})
 
 const categorySchema = new mongoose.Schema({
     description: {
@@ -23,7 +13,7 @@ const categorySchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    subCategories:{
+    subCategories:{ 
         type: [subCategorySchema],
         required: false,
         select: true,

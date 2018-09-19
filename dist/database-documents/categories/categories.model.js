@@ -1,11 +1,8 @@
 "use strict";
 exports.__esModule = true;
 var mongoose = require("mongoose");
-var subCategorySchema = new mongoose.Schema({
-    description: {
-        type: String
-    }
-});
+//import * as subcategories from '../subcategories/subcategories.model'
+var subcategories_model_1 = require("../subcategories/subcategories.model");
 var categorySchema = new mongoose.Schema({
     description: {
         type: String,
@@ -13,9 +10,9 @@ var categorySchema = new mongoose.Schema({
         unique: true
     },
     subCategories: {
-        type: [subCategorySchema],
+        type: [subcategories_model_1.subCategorySchema],
         required: false,
-        select: false,
+        select: true,
         "default": []
     }
 });

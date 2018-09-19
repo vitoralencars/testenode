@@ -1,6 +1,6 @@
 import {Server} from './server/server'
 import { error } from 'util';
-import {categoriesRouter} from './categories/categories.router'
+import {categoriesRouter} from './database-documents/categories/categories.router'
 
 const server = new Server()
 server.bootstrap([categoriesRouter]).then(server=>{

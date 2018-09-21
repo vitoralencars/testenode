@@ -49,7 +49,7 @@ var CategoriesRouter = /** @class */ (function (_super) {
             categories_model_1.Category.findById(req.params.id)
                 .then(function (category) {
                 if (category) {
-                    //category.subCategories = category.subCategories.forEach(())
+                    category.subCategories.splice;
                     return next();
                 }
                 else {
@@ -80,6 +80,7 @@ var CategoriesRouter = /** @class */ (function (_super) {
         application.put('/categories/:id', [this.validateId, this.replace]);
         application.patch('/categories/:id', [this.validateId, this.update]);
         application.del('/categories/:id', [this.validateId, this["delete"]]);
+        application.del('/categories/:id/subcategories/:id', [this.validateId, this["delete"]]);
     };
     return CategoriesRouter;
 }(model_router_1.ModelRouter));

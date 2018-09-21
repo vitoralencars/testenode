@@ -56,8 +56,8 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router{
     delete = (req, resp, next)=>{
         this.model.remove({_id:req.params.id})
             .exec()
-            .then((commandResult: any)=>{
-                if(commandResult.result.n){
+            .then((commandResult)=>{
+                if(commandResult.n){
                     resp.send(200)
                 }else{
                     resp.send(404)

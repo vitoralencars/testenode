@@ -65,7 +65,7 @@ var ModelRouter = /** @class */ (function (_super) {
             _this.model.remove({ _id: req.params.id })
                 .exec()
                 .then(function (commandResult) {
-                if (commandResult.result.n) {
+                if (commandResult.n) {
                     resp.send(200);
                 }
                 else {

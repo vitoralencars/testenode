@@ -61,7 +61,7 @@ class CategoriesRouter extends ModelRouter<Category> {
         Category.findById(req.params.id)
         .then(category=>{
             if(category){
-                //category.subCategories = category.subCategories.forEach(())
+                category.subCategories.splice
                 return next()
             }else{
             
@@ -86,6 +86,8 @@ class CategoriesRouter extends ModelRouter<Category> {
         application.patch('/categories/:id', [this.validateId, this.update])
 
         application.del('/categories/:id', [this.validateId, this.delete])
+
+        application.del('/categories/:id/subcategories/:id', [this.validateId, this.delete])
     }
 }
 

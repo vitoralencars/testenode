@@ -62,7 +62,7 @@ var ModelRouter = /** @class */ (function (_super) {
                 .then(_this.render(resp, next));
         };
         _this["delete"] = function (req, resp, next) {
-            _this.model.remove({ _id: req.params.id })
+            _this.model.remove({ description: req.params.description })
                 .exec()
                 .then(function (commandResult) {
                 if (commandResult.n) {

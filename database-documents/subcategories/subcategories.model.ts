@@ -2,7 +2,8 @@ import * as mongoose from 'mongoose'
 import {productSchema, ProductModel} from '../products/products.model'
 
 export interface SubCategoryModel extends mongoose.Document{
-    description: String
+    description: String,
+    products: ProductModel[]
 }
 
 export const subCategorySchema = new mongoose.Schema({

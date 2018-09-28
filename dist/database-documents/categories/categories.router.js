@@ -19,11 +19,26 @@ var CategoriesRouter = /** @class */ (function (_super) {
     __extends(CategoriesRouter, _super);
     function CategoriesRouter() {
         var _this = _super.call(this, categories_model_1.Category) || this;
-        _this.findSubCategory = function (req, resp, next) {
+        _this.findSubCategories = function (req, resp, next) {
             categories_model_1.Category.findById(req.params.id)
                 .then(function (category) {
                 if (category) {
                     resp.json(category.subCategories);
+                    return next();
+                }
+                else {
+                }
+            })["catch"](next);
+        };
+        _this.findSubCategory = function (req, resp, next) {
+            categories_model_1.Category.findById(req.params.idCategory)
+                .then(function (category) {
+                if (category) {
+                    category.subCategories.forEach(function (element) {
+                        if (element._id.equals(req.params.idSubCategory)) {
+                            resp.json(element);
+                        }
+                    });
                     return next();
                 }
                 else {
@@ -45,15 +60,23 @@ var CategoriesRouter = /** @class */ (function (_super) {
                 return next();
             })["catch"](next);
         };
-        _this.deleteSubCategory = function (req, resp, next) {
-            categories_model_1.Category.findById(req.params.id)
+        _this.addProducts = function (req, resp, next) {
+            categories_model_1.Category.findById(req.params.idCategory)
                 .then(function (category) {
                 if (category) {
-                    category.subCategories.splice;
-                    return next();
+                    category.subCategories.forEach(function (element) {
+                        if (element._id.equals(req.params.idSubCategory)) {
+                            element.products = _this.sortProductsArray(element.products.concat(req.body));
+                        }
+                    });
+                    return category.save();
                 }
                 else {
                 }
+            })
+                .then(function (category) {
+                resp.json(category);
+                return next();
             })["catch"](next);
         };
         _this.on('beforeRender', function (document) {
@@ -71,16 +94,29 @@ var CategoriesRouter = /** @class */ (function (_super) {
             return 0;
         });
     };
+    CategoriesRouter.prototype.sortProductsArray = function (products) {
+        return products.sort(function (a, b) {
+            if (a.description > b.description) {
+                return 1;
+            }
+            if (a.description < b.description) {
+                return -1;
+            }
+            return 0;
+        });
+    };
     CategoriesRouter.prototype.applyRoutes = function (application) {
         application.get('/categories', this.findAll);
         application.get('/categories/:id', [this.validateId, this.findById]);
-        application.get('/categories/:id/subcategories', [this.validateId, this.findSubCategory]);
+        application.get('/categories/:id/subcategories', [this.validateId, this.findSubCategories]);
+        application.get('/categories/:idCategory/subcategories/:idSubCategory', this.findSubCategory); //[this.validateId, this.findSubCategory2])
         application.post('/categories', this.save);
         application.put('/categories/:id/subcategories', [this.validateId, this.addSubCategories]);
+        application.put('/categories/:idCategory/subcategories/:idSubCategory/products', this.addProducts);
         application.put('/categories/:id', [this.validateId, this.replace]);
         application.patch('/categories/:id', [this.validateId, this.update]);
         application.del('/categories/:id', [this.validateId, this["delete"]]);
-        application.del('/categories/:id/subcategories/:id', [this.validateId, this["delete"]]);
+        application.del('/categories/:id/subcategories/:description', [this.validateId, this["delete"]]);
     };
     return CategoriesRouter;
 }(model_router_1.ModelRouter));
